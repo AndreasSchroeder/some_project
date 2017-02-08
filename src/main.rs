@@ -29,8 +29,10 @@ mod bot;
 mod renderable;
 mod effect;
 mod sounds;
+mod util;
 
 // own uses
+use util::coord_to_pixel;
 use camera::Cam;
 use player::{Player, LastKey, Direction, Weapon};
 use bot::Bot;
@@ -145,8 +147,8 @@ impl<'a> App<'a> {
                 }
             }
             // position of Player one in Pixel coordinates
-            let center_p1 = c.transform.trans(((self.player_one.coord.get_x() - range.x_min )* (SIZE_PER_TILE+ BORDER_BETWEEN_TILES)) as f64,
-                                          ((self.player_one.coord.get_y() - range.y_min)*  (SIZE_PER_TILE+ BORDER_BETWEEN_TILES)) as f64);
+            let center_p1 = c.transform.trans(coord_to_pixel(self.player_one.coord.get_x(), range.x_min),
+                                          coord_to_pixel(self.player_one.coord.get_y(), range.y_min));
 
             // render player one
             player_one.render(gl, center_p1);
@@ -155,28 +157,24 @@ impl<'a> App<'a> {
             if let Some(ref p2) = *player_two {
 
 
-                let center_p2 = c.transform.trans(((p2.coord.get_x() - range.x_min) *  (SIZE_PER_TILE+ BORDER_BETWEEN_TILES)) as f64,
-
-                                              ((p2.coord.get_y() - range.y_min )*  (SIZE_PER_TILE+ BORDER_BETWEEN_TILES)) as f64);
+                let center_p2 = c.transform.trans(coord_to_pixel(p2.coord.get_x(), range.x_min),
+                                              coord_to_pixel(p2.coord.get_y(), range.y_min));
                  p2.render(gl, center_p2);
-
-
             }
             // Render all bots
             for b in &mut self.bots {
                     if b.coord.get_x() >= range.x_min &&  b.coord.get_x() < range.x_max &&
                         b.coord.get_y() >= range.y_min && b.coord.get_y() < range.y_max {
 
-                        let center_b1 = c.transform.trans(((b.coord.get_x() - range.x_min )*  (SIZE_PER_TILE+ BORDER_BETWEEN_TILES)) as f64,
-                                                          ((b.coord.get_y() - range.y_min)*  (SIZE_PER_TILE+ BORDER_BETWEEN_TILES)) as f64);
+                        let center_b1 = c.transform.trans(coord_to_pixel(b.coord.get_x(), range.x_min ),
+                                                          coord_to_pixel(b.coord.get_y(), range.y_min));
                         b.render(gl, center_b1);
                 }
             }
-
             // Render all active effects
             for e in &effects.effects {
-                let center = c.transform.trans(((e.coord.get_x() - range.x_min )*  (SIZE_PER_TILE+ BORDER_BETWEEN_TILES)) as f64,
-                                              ((e.coord.get_y() - range.y_min)*  (SIZE_PER_TILE+ BORDER_BETWEEN_TILES)) as f64);
+                let center = c.transform.trans(coord_to_pixel(e.coord.get_x(), range.x_min ),
+                                              coord_to_pixel(e.coord.get_y(), range.y_min));
                 e.render(gl, center);
             }
         });
