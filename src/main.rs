@@ -43,10 +43,10 @@ use effect::{EffectHandler, EffectOption};
 use interactable::InteractableType;
 use renderable::Renderable;
 use io::all_sprites::SpriteMap;
+use std::process;
 use sounds::SoundHandler;
 
 //EINGABEN
-const TWO_PLAYER: bool = true;
 const SIZE_PER_TILE: u64 = 64;
 const BORDER_BETWEEN_TILES: u64 = 1;
 const CAMERA_BUF_X: u64 = 4;
@@ -54,6 +54,10 @@ const CAMERA_BUF_Y: u64 = 4;
 const WIDTH: i64 = 584;
 const HEIGHT: i64 = 584;
 const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
+const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
+const GREY: [f32; 4] = [0.5, 0.5, 0.5, 0.5];
+const GAME_NAME_PART1: &'static str = "Chicken Fight 3000";
+const GAME_NAME_PART2: &'static str = "Ultimate Tournament";
 
 /// struct for Settings
 pub struct Settings {
@@ -82,7 +86,7 @@ pub struct App<'a> {
 
 impl<'a> App<'a> {
     /// Constructor
-    fn new(mut players: Vec<Player<'a>>, mut bots: Vec<Bot<'a>>) -> Self {
+    fn new(mut players: Vec<Player<'a>>, bots: Vec<Bot<'a>>) -> Self {
         let mut p1 = match players.pop() {
             Some(p) => p,
             None => panic!("No player found!"),
@@ -327,7 +331,7 @@ impl<'a> App<'a> {
 
 /// Main
 fn main() {
-    let mut window: PistonWindow = WindowSettings::new("chicken_fight_3000_ultimate_tournament_reloaded_uncut_director's_edition",
+    let mut window: PistonWindow = WindowSettings::new(format!("{}{}", GAME_NAME_PART1, GAME_NAME_PART2),
                                                        [WIDTH as u32, HEIGHT as u32])
         .exit_on_esc(true)
         .fullscreen(false)
@@ -335,13 +339,13 @@ fn main() {
         .build()
         .unwrap();
 
-    println!("test");
+    // Create window
+    let mut events = window.events();
+
     // Create map for sprites and load all sprites
     let map = Settings::new(&mut window).sprite_map;
 
     // Create EffectHandler
-
-
     let mut effects = EffectHandler::new(&map);
 
     // Lade XML und erstelle daraus das Level, das Tileset, die Player und die Bots
@@ -366,9 +370,6 @@ fn main() {
 
     // Create new app with one or two players
     let mut app = App::new(players, bots);
-
-    // Create window
-    let mut events = window.events();
 
     // insert players in level
     level.get_data()[app.player_one.coord.get_x() as usize][app.player_one.coord.get_y() as usize]
@@ -397,23 +398,102 @@ fn main() {
         b.set_borders((level.get_width() as u64, level.get_height() as u64));
     }
 
+    let mut start_game = false;
+
+    let assets = find_folder::Search::ParentsThenKids(1, 1).for_folder("assets").unwrap();
+    let ref font = assets.join("font.ttf");
+    let factory = window.factory.clone();
+    let mut glyphs = Glyphs::new(font, factory).unwrap();
+
+    let start_menu = vec!["Start Game", "Load Game", "Settings", "Exit"];
+    let menu_size = start_menu.len();
+
+    let mut active_index = 0;
+
     // End of Loading start game
     while let Some(e) = events.next(&mut window) {
-        // Calculate Milliseconds
-        let now = start.to(PreciseTime::now()).num_milliseconds();
+        if !start_game {
+            if let Some(i) = e.press_args() {
+                match i {
+                    /* Check arrow keys for menu */
+                    Button::Keyboard(Key::Return) => {
+                        match active_index {
+                            0 => start_game = true,
+                            1 | 2 => (),
+                            3 => process::exit(1),
+                            _ => (),
+                        }
+                    },
+                    Button::Keyboard(Key::Down) => {
+                        if active_index == menu_size - 1 {
+                            active_index = 0;
+                        } else {
+                            active_index += 1;
+                        }
+                    },
+                    Button::Keyboard(Key::Up) => {
+                        if active_index == 0 {
+                            active_index = menu_size - 1;
+                        } else {
+                            active_index -= 1;
+                        }
+                    },
+                    _ => (),
+                }
+            }
+            if let Some(_) = e.render_args() {
+                window.draw_2d(&e, |c, gl| {
+                    // Clear the screen.
+                    clear(BLACK, gl);
 
-        // Calculate state
-        let state = if now <= 500 { 0 } else { 1 };
+                    // Render menu
+                    text::Text::new_color(WHITE, 32).draw(
+                        GAME_NAME_PART1,
+                        &mut glyphs,
+                        &c.draw_state,
+                        c.transform.trans(WIDTH as f64 / 2.0 - 180.0, 100.0), gl
+                    );
+                    text::Text::new_color(WHITE, 32).draw(
+                        GAME_NAME_PART2,
+                        &mut glyphs,
+                        &c.draw_state,
+                        c.transform.trans(WIDTH as f64 / 2.0 - 200.0, 150.0), gl
+                    );
 
-        // If Render-Event
-        if let Some(_) = e.render_args() {
-            app.on_draw(&mut window,
-                        &e,
-                        &tileset,
-                        &mut level,
-                        now as usize,
-                        &effects);
-        }
+                    let mut distance = 0.0;
+
+                    for s in &start_menu {
+                        let color = match &start_menu[active_index] == s {
+                            true => WHITE,
+                            false => GREY,
+                        };
+
+                        text::Text::new_color(color, 32).draw(
+                            s,
+                            &mut glyphs,
+                            &c.draw_state,
+                            c.transform.trans(WIDTH as f64 / 2.0 - 100.0, 400.0 + distance), gl
+                        );
+                        distance += 50.0;
+                    }
+                });
+            }
+        } else {
+            // Calculate Milliseconds
+            let now = start.to(PreciseTime::now()).num_milliseconds();
+
+            // Calculate state
+            let state = if now <= 500 { 0 } else { 1 };
+
+            // If Render-Event
+            if let Some(_) = e.render_args() {
+                app.on_draw(&mut window,
+                            &e,
+                            &tileset,
+                            &mut level,
+                            now as usize,
+                            &effects);
+            }
 
         // If Key-Press-Event
         if let Some(i) = e.release_args() {
@@ -429,11 +509,11 @@ fn main() {
             if let Some(u) = e.update_args() {
                 app.on_update(&u, &mut level, state, &mut effects);
             }
-        }
 
-        // restart time if 1 second over
-        if now > 1000 {
-            start = PreciseTime::now();
+            // restart time if 1 second over
+            if now > 1000 {
+                start = PreciseTime::now();
+            }
         }
     }
 }

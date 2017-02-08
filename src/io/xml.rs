@@ -43,7 +43,7 @@ pub fn load_xml<'a>(path: &str, map: &'a SpriteMap, mut w: &mut PistonWindow) ->
                         let tile_height = match it.next() {
                             Some(s) => match u32::from_str(&s.value) {
                                 Ok(n) => n,
-                                Err(e) => panic!("{:?} is not a number!", s.value),
+                                Err(_) => panic!("{:?} is not a number!", s.value),
                             },
                             None => panic!("Wrong xml format!"),
                         };
@@ -51,7 +51,7 @@ pub fn load_xml<'a>(path: &str, map: &'a SpriteMap, mut w: &mut PistonWindow) ->
                         let tile_width = match it.next() {
                             Some(s) => match u32::from_str(&s.value) {
                                 Ok(n) => n,
-                                Err(e) => panic!("{:?} is not a number!", s.value),
+                                Err(_) => panic!("{:?} is not a number!", s.value),
                             },
                             None => panic!("Wrong xml format!"),
                         };
@@ -59,7 +59,7 @@ pub fn load_xml<'a>(path: &str, map: &'a SpriteMap, mut w: &mut PistonWindow) ->
                         let tileset_height = match it.next() {
                             Some(s) => match u32::from_str(&s.value) {
                                 Ok(n) => n,
-                                Err(e) => panic!("{:?} is not a number!", s.value),
+                                Err(_) => panic!("{:?} is not a number!", s.value),
                             },
                             None => panic!("Wrong xml format!"),
                         };
@@ -67,7 +67,7 @@ pub fn load_xml<'a>(path: &str, map: &'a SpriteMap, mut w: &mut PistonWindow) ->
                         let tileset_width = match it.next() {
                             Some(s) => match u32::from_str(&s.value) {
                                 Ok(n) => n,
-                                Err(e) => panic!("{:?} is not a number!", s.value),
+                                Err(_) => panic!("{:?} is not a number!", s.value),
                             },
                             None => panic!("Wrong xml format!"),
                         };
@@ -109,14 +109,14 @@ pub fn load_xml<'a>(path: &str, map: &'a SpriteMap, mut w: &mut PistonWindow) ->
                         let x = match it.next() {
                             Some(s) => match u64::from_str(&s.value) {
                                 Ok(n) => n,
-                                Err(e) => panic!("{:?} is not a number!", s.value),
+                                Err(_) => panic!("{:?} is not a number!", s.value),
                             },
                             None => panic!("Wrong xml format!"),
                         };
                         let y = match it.next() {
                             Some(s) => match u64::from_str(&s.value) {
                                 Ok(n) => n,
-                                Err(e) => panic!("{:?} is not a number!", s.value),
+                                Err(_) => panic!("{:?} is not a number!", s.value),
                             },
                             None => panic!("Wrong xml format!"),
                         };
@@ -136,14 +136,14 @@ pub fn load_xml<'a>(path: &str, map: &'a SpriteMap, mut w: &mut PistonWindow) ->
                         let x = match it.next() {
                             Some(s) => match u64::from_str(&s.value) {
                                 Ok(n) => n,
-                                Err(e) => panic!("{:?} is not a number!", s.value),
+                                Err(_) => panic!("{:?} is not a number!", s.value),
                             },
                             None => panic!("Wrong xml format!"),
                         };
                         let y = match it.next() {
                             Some(s) => match u64::from_str(&s.value) {
                                 Ok(n) => n,
-                                Err(e) => panic!("{:?} is not a number!", s.value),
+                                Err(_) => panic!("{:?} is not a number!", s.value),
                             },
                             None => panic!("Wrong xml format!"),
                         };
@@ -164,14 +164,14 @@ pub fn load_xml<'a>(path: &str, map: &'a SpriteMap, mut w: &mut PistonWindow) ->
                         let x = match it.next() {
                             Some(s) => match u64::from_str(&s.value) {
                                 Ok(n) => n,
-                                Err(e) => panic!("{:?} is not a number!", s.value),
+                                Err(_) => panic!("{:?} is not a number!", s.value),
                             },
                             None => panic!("Wrong xml format!"),
                         };
                         let y = match it.next() {
                             Some(s) => match u64::from_str(&s.value) {
                                 Ok(n) => n,
-                                Err(e) => panic!("{:?} is not a number!", s.value),
+                                Err(_) => panic!("{:?} is not a number!", s.value),
                             },
                             None => panic!("Wrong xml format!"),
                         };
